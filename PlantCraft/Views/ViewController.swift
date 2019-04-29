@@ -16,10 +16,20 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     // A serial queue for thread safety when modifying SceneKit's scene graph.
     let updateQueue = DispatchQueue(label: "\(Bundle.main.bundleIdentifier!).serialSCNQueue")
+    
+    // MARK - Visual stuff
     var blocks = [String: Block]()
+    var connectors = [String: Connector]()
+    
+    // Keeps referneces between blocks and connectors
+    var connections = [String:String]()
+
 //    var cyl = SCNNode()
     
     // Have to store the tree of images/commands
+    // Maybe have a distance threshold for checking?
+    
+    // Figure out drawing the cylinders and updating their positions.
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +59,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         // Create a session configuration
         let configuration = ARImageTrackingConfiguration()
         configuration.trackingImages = refImages
-        configuration.maximumNumberOfTrackedImages = 10
+        configuration.maximumNumberOfTrackedImages = 20
         
         // Run the view's session
         sceneView.session.run(configuration, options: ARSession.RunOptions(arrayLiteral: [.resetTracking, .removeExistingAnchors]))
@@ -57,85 +67,48 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         // Pause the view's session
         sceneView.session.pause()
     }
     
     // MARK: - ARSessionDelegate
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // iterate through the current anchords
-//        guard let anchors = self.anchors else { return }
-//        guard let g = anchors["GROW"] else { return }
-//        guard let r = anchors["REPEAT"] else { return }
-//
-        
-//        print(g.transform.position())
-//        print(r.transform.position())
-        
-//        for (name, anchor) in anchors {
-//
-//        }
-//
-        // First task: get a line to draw between the image markers
-//        cyl = makeCylinder(positionStart: g.transform.position(),
-//                     positionEnd: r.transform.position(),
-//                     radius: 0.01,
-//                     color: UIColor.blue,
-//                     transparency: 1.0)
-        
-        
         parseAnchors()
-        
     }
     
     // Function for parsing the visual input
     // actually no this needs to be recursive
     func parseAnchors() {
-        // 1. Look for the start marker
-        guard let start = self.blocks["GROW"] else { return }
-        
-        // 2. Find the next marker to go to
-        // Fill up a history list of the types of blocks that have been encountered
-        // var history: [BlockType]!
-        
-        // Find next for each
-        // This is On^2
-        
-        
-//        print(start.rotation)
-        
-//        print("FROM: \(block.id!), TO: \(next.id!)")
-        
-        var parsedBlocks = blocks
-        
-        for (name, block) in parsedBlocks {
-            
-            let next = findNext(from: block)
-            parsedBlocks[name] = nil
-            
-//            print("FROM: \(block.id!), TO: \(next.id!)")
-
+        for (name, block) in blocks {
+            // If this was already connected to
+            if connections.values.contains(name) {
+                continue
+            }
+            guard  let next = findNext(from: block) else { continue }
+            connections[name] = next.id
+            connectors[block.id]!.update(startPos: block.position, endPos: next.position)
         }
-//
-//        print("\n")
         
     }
     
-    func findNext(from: Block) -> Block {
+    // Figure out this function. Finding the next block.
+    func findNext(from: Block) -> Block? {
         
-        var next: Block!
+        var next: Block?
         var minDist = Float.greatestFiniteMagnitude
-        
+
         for (name, block) in blocks where name != from.id! {
+            
             // minimum distance given the direction/orientation of the anchor
             let dist = (from.position - block.position).magnitude
+            
+            // Assign the new next block
             if dist < minDist {
                 minDist = dist
                 next = block
             }
+            
         }
-        
         return next
     }
 
@@ -152,12 +125,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         // Abstract this into an update function
         blocks[imageAnchor.name!]?.anchor = imageAnchor
         blocks[imageAnchor.name!]?.rotation = node.eulerAngles
-        
-//        print("name: \(imageAnchor.name!)")
-//        print("orientation \(node.orientation)")
-//        print("rotation \(node.rotation)")
-//        print("euler angles \(node.eulerAngles)")
-//        print("\n")
 
     }
     
@@ -181,6 +148,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         let block = Block(type: type, node: node, anchor: imageAnchor)
         blocks[imageAnchor.name!] = block
         
+        // Initialize an edge
+        let connector = Connector(positionStart: block.position, positionEnd: SCNVector3Zero, radius: 0.01, color: UIColor.yellow)
+        connectors[imageAnchor.name!] = connector
+
+        self.sceneView.scene.rootNode.addChildNode(connector)
+
         print("orientation \(node.orientation)")
         print("rotation \(node.rotation)")
         print("euler angles \(node.eulerAngles)")
@@ -240,66 +213,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
-    }
-    
-    
-    func makeCylinder(positionStart: SCNVector3, positionEnd: SCNVector3, radius: CGFloat , color: UIColor, transparency: CGFloat) -> SCNNode
-    {
-        let height = CGFloat(GLKVector3Distance(SCNVector3ToGLKVector3(positionStart), SCNVector3ToGLKVector3(positionEnd)))
-        let startNode = SCNNode()
-        let endNode = SCNNode()
-        
-        startNode.position = positionStart
-        endNode.position = positionEnd
-        
-        let zAxisNode = SCNNode()
-        zAxisNode.eulerAngles.x = Float(CGFloat(M_PI_2))
-        
-        let cylinderGeometry = SCNCylinder(radius: radius, height: height)
-        cylinderGeometry.firstMaterial?.diffuse.contents = color
-        let cylinder = SCNNode(geometry: cylinderGeometry)
-        
-        cylinder.position.y = Float(-height/2)
-        zAxisNode.addChildNode(cylinder)
-        
-        let returnNode = SCNNode()
-        
-        if (positionStart.x > 0.0 && positionStart.y < 0.0 && positionStart.z < 0.0 && positionEnd.x > 0.0 && positionEnd.y < 0.0 && positionEnd.z > 0.0)
-        {
-            endNode.addChildNode(zAxisNode)
-            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
-            returnNode.addChildNode(endNode)
-            
-        }
-        else if (positionStart.x < 0.0 && positionStart.y < 0.0 && positionStart.z < 0.0 && positionEnd.x < 0.0 && positionEnd.y < 0.0 && positionEnd.z > 0.0)
-        {
-            endNode.addChildNode(zAxisNode)
-            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
-            returnNode.addChildNode(endNode)
-            
-        }
-        else if (positionStart.x < 0.0 && positionStart.y > 0.0 && positionStart.z < 0.0 && positionEnd.x < 0.0 && positionEnd.y > 0.0 && positionEnd.z > 0.0)
-        {
-            endNode.addChildNode(zAxisNode)
-            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
-            returnNode.addChildNode(endNode)
-            
-        }
-        else if (positionStart.x > 0.0 && positionStart.y > 0.0 && positionStart.z < 0.0 && positionEnd.x > 0.0 && positionEnd.y > 0.0 && positionEnd.z > 0.0)
-        {
-            endNode.addChildNode(zAxisNode)
-            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
-            returnNode.addChildNode(endNode)
-            
-        }
-        else
-        {
-            startNode.addChildNode(zAxisNode)
-            startNode.constraints = [ SCNLookAtConstraint(target: endNode) ]
-            returnNode.addChildNode(startNode)
-        }
-        
-        return returnNode
     }
 }
 
