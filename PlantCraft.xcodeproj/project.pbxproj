@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		36E025CC2276684100868488 /* SCNVector3+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E025CB2276684100868488 /* SCNVector3+Extensions.swift */; };
+		36E025CE2276694800868488 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E025CD2276694800868488 /* Block.swift */; };
+		36E025D022767BE800868488 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E025CF22767BE800868488 /* Program.swift */; };
 		36E336952274E027007FBB86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E336942274E027007FBB86 /* AppDelegate.swift */; };
 		36E336972274E027007FBB86 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 36E336962274E027007FBB86 /* art.scnassets */; };
 		36E336992274E027007FBB86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E336982274E027007FBB86 /* ViewController.swift */; };
@@ -35,6 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		36E025CB2276684100868488 /* SCNVector3+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extensions.swift"; sourceTree = "<group>"; };
+		36E025CD2276694800868488 /* Block.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
+		36E025CF22767BE800868488 /* Program.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
 		36E336912274E027007FBB86 /* PlantCraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlantCraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36E336942274E027007FBB86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36E336962274E027007FBB86 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -76,6 +82,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		36E025D122767C6100868488 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				36E025CB2276684100868488 /* SCNVector3+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		36E025D222767C6B00868488 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				36E336982274E027007FBB86 /* ViewController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		36E025D322767C7700868488 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				36E025CD2276694800868488 /* Block.swift */,
+				36E025CF22767BE800868488 /* Program.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		36E336882274E027007FBB86 = {
 			isa = PBXGroup;
 			children = (
@@ -101,7 +132,9 @@
 			children = (
 				36E336942274E027007FBB86 /* AppDelegate.swift */,
 				36E336962274E027007FBB86 /* art.scnassets */,
-				36E336982274E027007FBB86 /* ViewController.swift */,
+				36E025D222767C6B00868488 /* Views */,
+				36E025D322767C7700868488 /* Models */,
+				36E025D122767C6100868488 /* Extensions */,
 				36E3369A2274E027007FBB86 /* Main.storyboard */,
 				36E3369D2274E027007FBB86 /* Assets.xcassets */,
 				36E3369F2274E027007FBB86 /* LaunchScreen.storyboard */,
@@ -260,8 +293,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36E025D022767BE800868488 /* Program.swift in Sources */,
 				36E336992274E027007FBB86 /* ViewController.swift in Sources */,
+				36E025CE2276694800868488 /* Block.swift in Sources */,
 				36E336952274E027007FBB86 /* AppDelegate.swift in Sources */,
+				36E025CC2276684100868488 /* SCNVector3+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +475,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8TWVWBQE3T;
 				INFOPLIST_FILE = PlantCraft/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -457,6 +494,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 8TWVWBQE3T;
 				INFOPLIST_FILE = PlantCraft/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
