@@ -17,19 +17,16 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     // A serial queue for thread safety when modifying SceneKit's scene graph.
     let updateQueue = DispatchQueue(label: "\(Bundle.main.bundleIdentifier!).serialSCNQueue")
     
-    // MARK - Visual stuff
+    // MARK: - Visual stuff
     var blocks = [String: Block]()
     var connectors = [String: Connector]()
     
-    // Keeps referneces between blocks and connectors
+    // Keeps references between blocks
     var connections = [String:String]()
-
-//    var cyl = SCNNode()
     
-    // Have to store the tree of images/commands
-    // Maybe have a distance threshold for checking?
-    
-    // Figure out drawing the cylinders and updating their positions.
+    // MARK: - User parameters
+    // Level of recursion
+    var depthLevel: Int = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,11 +39,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         
         // Create a new scene
         let scene = SCNScene()
-        
         sceneView.session.delegate = self
+        sceneView.debugOptions = [.showCameras ,.showBoundingBoxes, .showWorldOrigin, .showConstraints]
         
         // Set the scene to the view
         sceneView.scene = scene
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -73,32 +71,34 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     // MARK: - ARSessionDelegate
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        parseAnchors()
     }
     
     // Function for parsing the visual input
     // actually no this needs to be recursive
     func parseAnchors() {
         for (name, block) in blocks {
-            // If this was already connected to
+            
+            // If this was already connected to, skip. This avoids duplicate connections
             if connections.values.contains(name) {
                 continue
             }
+            
+            // only go on if the block actually has something next to it
             guard  let next = findNext(from: block) else { continue }
+            
+            // Update the connections based on the block positions
             connections[name] = next.id
-            connectors[block.id]!.update(startPos: block.position, endPos: next.position)
         }
-        
     }
+    
     
     // Figure out this function. Finding the next block.
     func findNext(from: Block) -> Block? {
         
         var next: Block?
         var minDist = Float.greatestFiniteMagnitude
-
+        
         for (name, block) in blocks where name != from.id! {
-            
             // minimum distance given the direction/orientation of the anchor
             let dist = (from.position - block.position).magnitude
             
@@ -107,12 +107,38 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 minDist = dist
                 next = block
             }
-            
         }
         return next
     }
-
+    
+    func renderPlant() {
+        // given blocks and connections
+        // you dont need the angles?
+        // draw lines between them!
+        for (from, to) in connections {
+            
+            guard let fb = blocks[from] else { return }
+            guard let tb = blocks[to] else { return }
+            guard let conn = connectors[from] else { return }
+            
+            fb.node.look(at: tb.position)
+            conn.update(startPos: fb.position, endPos: tb.position)
+        }
+    }
+    
+    // Recursively duplicates the given blocks/connections
+    // Pass down the size?
+    func recurse(depth: Int) {
+        // Recurse down until depth is 1
+        if(depth == 1) {
+            return
+        } else {
+            recurse(depth: depth-1)
+        }
+    }
+    
     // MARK: - ARSCNViewDelegate
+    
 //     Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         let node = SCNNode()
@@ -120,21 +146,22 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        // Make sure the image  anchor exists
         guard let imageAnchor = anchor as? ARImageAnchor else { return }
         
-        // Abstract this into an update function
-        blocks[imageAnchor.name!]?.anchor = imageAnchor
-        blocks[imageAnchor.name!]?.rotation = node.eulerAngles
-
+        // Update the block
+        blocks[imageAnchor.name!]?.update(node: node, anchor: imageAnchor)
+        
+        // Reparse and rerender
+        parseAnchors()
+        renderPlant()
     }
     
     
     // Adds the marker nodes to the scene.
-    
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         
         guard let imageAnchor = anchor as? ARImageAnchor else { return }
-        
         let type: BlockType!
         
         if imageAnchor.name! == "GROW" {
@@ -145,28 +172,20 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             type = BlockType.leaf
         }
         
+        // Add the block
         let block = Block(type: type, node: node, anchor: imageAnchor)
         blocks[imageAnchor.name!] = block
         
         // Initialize an edge
-        let connector = Connector(positionStart: block.position, positionEnd: SCNVector3Zero, radius: 0.01, color: UIColor.yellow)
+        let connector = Connector(positionStart: block.position, positionEnd: SCNVector3Zero, radius: 0.0075, color: UIColor.yellow)
         connectors[imageAnchor.name!] = connector
-
         self.sceneView.scene.rootNode.addChildNode(connector)
-
-        print("orientation \(node.orientation)")
-        print("rotation \(node.rotation)")
-        print("euler angles \(node.eulerAngles)")
         
         // Delegate rendering tasks to our `updateQueue` thread to keep things thread-safe!
         updateQueue.async {
- 
-            
+
             let physicalWidth = imageAnchor.referenceImage.physicalSize.width
             let physicalHeight = imageAnchor.referenceImage.physicalSize.height
-            
-            // This bit is important. It helps us create occlusion so virtual things stay hidden behind the detected image
-            // mainPlane.firstMaterial?.colorBufferWriteMask = .alpha
             
             // Create a plane geometry to visualize the initial position of the detected image
             let mainPlane = SCNPlane(width: physicalWidth, height: physicalHeight)
@@ -174,10 +193,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             
             switch(imageAnchor.name) {
             case "GROW":
-                color = UIColor.green
+                color = UIColor.brown
                 break
             case "LEAF":
-                color = UIColor.red
+                color = UIColor.green
                 break
             case "REPEAT":
                 color = UIColor.blue
@@ -187,16 +206,30 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 return
             }
             
-            // Create a SceneKit root node with the plane geometry to attach to the scene graph
-            // This node will hold the virtual UI in place
-            let mainNode = SCNNode(geometry: mainPlane)
-            mainNode.eulerAngles.x = -.pi / 2
-            mainNode.renderingOrder = -1
-            mainNode.opacity = 1
+            // Assign the color
             mainPlane.firstMaterial?.diffuse.contents = color
             
+            // Create a SceneKit root node with the plane geometry to attach to the scene graph
+            // This node will hold the virtual UI in place
+            //  x reference
+            let xReferenceNode = SCNNode(geometry: mainPlane)
+            xReferenceNode.eulerAngles.x = -.pi
+            xReferenceNode.renderingOrder = -1
+            xReferenceNode.opacity = 0.5
+            
+            // This is the marker
+            let markerNode = SCNNode(geometry: mainPlane)
+            markerNode.eulerAngles.x = -.pi/2
+            markerNode.renderingOrder = 0
+            markerNode.opacity = 0.25
+            
+            let sphereNode = SCNNode(geometry: SCNSphere(radius: 0.015))
+            sphereNode.renderingOrder = 1
+            
             // Add the plane visualization to the scene
-            node.addChildNode(mainNode)
+            node.addChildNode(xReferenceNode)
+            node.addChildNode(markerNode)
+            node.addChildNode(sphereNode)
         }
     }
     
@@ -214,24 +247,4 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
     }
-}
-
-extension matrix_float4x4 {
-    func position() -> SCNVector3 {
-        return SCNVector3(self.columns.3.x, self.columns.3.y, self.columns.3.z)
-    }
-}
-
-extension ARImageAnchor {
-    var position: SCNVector3 {
-        get {
-            return SCNVector3(self.transform.columns.3.x, self.transform.columns.3.y, self.transform.columns.3.z)
-        }
-    }
-    
-//    var rotation: (Float,Float,Float) {
-//        get {
-//            return (0,0,0)
-//        }
-//    }
 }

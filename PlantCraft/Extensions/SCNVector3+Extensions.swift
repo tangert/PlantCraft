@@ -132,4 +132,5 @@ extension SCNVector3 {
         let cosineAngle = (dotProduct(vectorB) / (magnitude * vectorB.magnitude))
         return SCNFloat(acos(cosineAngle))
     }
+    
 }

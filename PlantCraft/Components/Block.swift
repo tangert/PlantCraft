@@ -18,19 +18,33 @@ enum BlockType {
 class Block {
     
     var type: BlockType!
+    var node: SCNNode!
     var anchor: ARImageAnchor!
     var position: SCNVector3 {
-        return self.anchor.position
+        return self.node.position
     }
-    var transform: simd_float4x4!
-    var rotation: SCNVector3!
-    var id: String!
+    var transform: SCNMatrix4 {
+        return self.node.transform
+    }
+    var rotation: SCNVector4 {
+        return self.node.rotation
+    }
+    var eulerAngles: SCNVector3 {
+        return self.node.eulerAngles
+    }
+    var id: String! {
+        return self.anchor.name!
+    }
     
     init(type: BlockType, node: SCNNode, anchor: ARImageAnchor) {
         self.type = type
         self.anchor = anchor
-        self.id = anchor.name!
-        self.transform = anchor.transform
-        self.rotation = node.eulerAngles
+        self.node = node
     }
+    
+    func update(node: SCNNode, anchor: ARImageAnchor) {
+        self.node = node
+        self.anchor = anchor
+    }
+    
 }

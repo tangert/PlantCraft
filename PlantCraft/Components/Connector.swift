@@ -26,6 +26,8 @@ class Connector: SCNNode {
         startNode.position = positionStart
         endNode.position = positionEnd
         zAxisNode.eulerAngles.x = .pi/2
+        
+        cylinderNode.geometry?.firstMaterial?.diffuse.contents = color
         updateCylinder(startPos: positionStart, endPos: positionEnd)
         zAxisNode.addChildNode(cylinderNode)
         self.addChildNode(endNode)
