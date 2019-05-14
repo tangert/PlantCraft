@@ -10,12 +10,15 @@ import Foundation
 import SceneKit
 
 class Connector: SCNNode {
-    
+
     let startNode = SCNNode()
     let endNode = SCNNode()
     let zAxisNode = SCNNode()
     let cylinderNode = SCNNode()
-    var radius: CGFloat = 0.01
+    var radius: CGFloat!
+    
+    var from: Block!
+    var to: Block!
     
     init(positionStart: SCNVector3, positionEnd: SCNVector3, radius: CGFloat, color: UIColor){
         super.init()

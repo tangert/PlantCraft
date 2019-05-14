@@ -2,7 +2,7 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "LEAF RED.png"
+      "filename" : "LEAF_4.png"
     }
   ],
   "info" : {
@@ -10,7 +10,6 @@
     "author" : "xcode"
   },
   "properties" : {
-    "width" : 2,
-    "unit" : "inches"
+    "width" : 0
   }
 }

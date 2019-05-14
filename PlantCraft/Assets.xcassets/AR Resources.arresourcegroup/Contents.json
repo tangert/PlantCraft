@@ -5,13 +5,40 @@
   },
   "resources" : [
     {
-      "filename" : "GROW.arreferenceimage"
+      "filename" : "GROW_1.arreferenceimage"
     },
     {
-      "filename" : "LEAF.arreferenceimage"
+      "filename" : "GROW_2.arreferenceimage"
     },
     {
-      "filename" : "REPEAT.arreferenceimage"
+      "filename" : "GROW_3.arreferenceimage"
+    },
+    {
+      "filename" : "LEAF_1.arreferenceimage"
+    },
+    {
+      "filename" : "LEAF_2.arreferenceimage"
+    },
+    {
+      "filename" : "LEAF_3.arreferenceimage"
+    },
+    {
+      "filename" : "LEAF_4.arreferenceimage"
+    },
+    {
+      "filename" : "LEAF_5.arreferenceimage"
+    },
+    {
+      "filename" : "LEAF_6.arreferenceimage"
+    },
+    {
+      "filename" : "REPEAT_1.arreferenceimage"
+    },
+    {
+      "filename" : "REPEAT_2.arreferenceimage"
+    },
+    {
+      "filename" : "REPEAT_3.arreferenceimage"
     }
   ]
 }

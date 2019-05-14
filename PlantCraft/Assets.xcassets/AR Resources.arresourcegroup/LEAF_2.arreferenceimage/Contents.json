@@ -2,7 +2,7 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "GROW RED.png"
+      "filename" : "LEAF_2.png"
     }
   ],
   "info" : {
@@ -10,7 +10,7 @@
     "author" : "xcode"
   },
   "properties" : {
-    "width" : 2,
+    "width" : 1.0033112582781456,
     "unit" : "inches"
   }
 }
