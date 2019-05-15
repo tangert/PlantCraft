@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		364CB2602283942C00F66C46 /* ARAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 364CB25F2283942C00F66C46 /* ARAssets.xcassets */; };
+		36557F3B228B7EE600489CE7 /* PhysicalBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36557F3A228B7EE600489CE7 /* PhysicalBlock.swift */; };
+		36557F3D228B7EEE00489CE7 /* VirtualBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36557F3C228B7EEE00489CE7 /* VirtualBlock.swift */; };
+		36557F3F228B7F0E00489CE7 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36557F3E228B7F0E00489CE7 /* Block.swift */; };
 		36D50FB72277768800E7302F /* Connector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36D50FB62277768800E7302F /* Connector.swift */; };
 		36D50FB92277898D00E7302F /* ARKit+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36D50FB82277898D00E7302F /* ARKit+Extensions.swift */; };
 		36D5C9072278FEDC006B4C72 /* Scraps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36D5C9062278FEDC006B4C72 /* Scraps.swift */; };
 		36E025CC2276684100868488 /* SCNVector3+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E025CB2276684100868488 /* SCNVector3+Extensions.swift */; };
-		36E025CE2276694800868488 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E025CD2276694800868488 /* Block.swift */; };
 		36E336952274E027007FBB86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E336942274E027007FBB86 /* AppDelegate.swift */; };
 		36E336972274E027007FBB86 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 36E336962274E027007FBB86 /* art.scnassets */; };
 		36E336992274E027007FBB86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E336982274E027007FBB86 /* ViewController.swift */; };
@@ -20,7 +22,6 @@
 		36E336A12274E027007FBB86 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36E3369F2274E027007FBB86 /* LaunchScreen.storyboard */; };
 		36E336AC2274E027007FBB86 /* PlantCraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E336AB2274E027007FBB86 /* PlantCraftTests.swift */; };
 		36E336B72274E027007FBB86 /* PlantCraftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E336B62274E027007FBB86 /* PlantCraftUITests.swift */; };
-		36F9E5F72278B839006B16D5 /* Plant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F9E5F62278B839006B16D5 /* Plant.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,11 +43,13 @@
 
 /* Begin PBXFileReference section */
 		364CB25F2283942C00F66C46 /* ARAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ARAssets.xcassets; sourceTree = "<group>"; };
+		36557F3A228B7EE600489CE7 /* PhysicalBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicalBlock.swift; sourceTree = "<group>"; };
+		36557F3C228B7EEE00489CE7 /* VirtualBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualBlock.swift; sourceTree = "<group>"; };
+		36557F3E228B7F0E00489CE7 /* Block.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
 		36D50FB62277768800E7302F /* Connector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connector.swift; sourceTree = "<group>"; };
 		36D50FB82277898D00E7302F /* ARKit+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARKit+Extensions.swift"; sourceTree = "<group>"; };
 		36D5C9062278FEDC006B4C72 /* Scraps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scraps.swift; sourceTree = "<group>"; };
 		36E025CB2276684100868488 /* SCNVector3+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNVector3+Extensions.swift"; sourceTree = "<group>"; };
-		36E025CD2276694800868488 /* Block.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
 		36E336912274E027007FBB86 /* PlantCraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlantCraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36E336942274E027007FBB86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36E336962274E027007FBB86 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -60,7 +63,6 @@
 		36E336B22274E027007FBB86 /* PlantCraftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlantCraftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36E336B62274E027007FBB86 /* PlantCraftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantCraftUITests.swift; sourceTree = "<group>"; };
 		36E336B82274E027007FBB86 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		36F9E5F62278B839006B16D5 /* Plant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plant.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,9 +110,10 @@
 		36E025D322767C7700868488 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				36E025CD2276694800868488 /* Block.swift */,
 				36D50FB62277768800E7302F /* Connector.swift */,
-				36F9E5F62278B839006B16D5 /* Plant.swift */,
+				36557F3A228B7EE600489CE7 /* PhysicalBlock.swift */,
+				36557F3C228B7EEE00489CE7 /* VirtualBlock.swift */,
+				36557F3E228B7F0E00489CE7 /* Block.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -304,12 +307,13 @@
 			files = (
 				36E336992274E027007FBB86 /* ViewController.swift in Sources */,
 				36D50FB92277898D00E7302F /* ARKit+Extensions.swift in Sources */,
-				36E025CE2276694800868488 /* Block.swift in Sources */,
 				36D5C9072278FEDC006B4C72 /* Scraps.swift in Sources */,
 				36E336952274E027007FBB86 /* AppDelegate.swift in Sources */,
-				36F9E5F72278B839006B16D5 /* Plant.swift in Sources */,
 				36D50FB72277768800E7302F /* Connector.swift in Sources */,
+				36557F3B228B7EE600489CE7 /* PhysicalBlock.swift in Sources */,
+				36557F3F228B7F0E00489CE7 /* Block.swift in Sources */,
 				36E025CC2276684100868488 /* SCNVector3+Extensions.swift in Sources */,
+				36557F3D228B7EEE00489CE7 /* VirtualBlock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

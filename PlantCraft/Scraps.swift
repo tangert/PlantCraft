@@ -358,3 +358,19 @@ import Foundation
 //
 //    }
 //}
+
+
+//
+//func getAngle(v1: SCNVector3, v2: SCNVector3, v3: SCNVector3, degrees: Bool) -> Float {
+//    let a = pow(v2.x - v1.x,2) + pow(v2.y-v1.y,2) + pow(v2.z-v1.z,2)
+//    let b = pow(v2.x-v3.x,2) + pow(v2.y-v3.y,2) + pow(v2.z-v3.z,2)
+//    let c = pow(v3.x-v1.x,2) + pow(v3.y-v1.y,2) + pow(v3.z-v1.z,2)
+//
+//    var division: Float
+//    if degrees {
+//        division = 360 / (2 * Float.pi)
+//    } else {
+//        division = 1
+//    }
+//    return (acos( (a+b-c) / sqrt(4*a*b))) * Float(division)
+//}

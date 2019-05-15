@@ -11,18 +11,33 @@ import SceneKit
 
 class Connector: SCNNode {
 
-    let startNode = SCNNode()
-    let endNode = SCNNode()
+    var startNode = SCNNode()
+    var endNode = SCNNode()
     let zAxisNode = SCNNode()
     let cylinderNode = SCNNode()
     var radius: CGFloat!
+    var startBlock: Block!
+    var endBlock: Block!
+    var children = [Connector]()
+    var depth: Int!
+    var id: String!
     
-    var from: Block!
-    var to: Block!
+    init(start: Block, end: Block, depth: Int) {
+        super.init()
+        startBlock = start
+        endBlock = end
+        self.depth = depth
+        startNode = startBlock.node!
+        endNode = endBlock.node!
+        setupGeometry(positionStart: startNode.position, positionEnd: endNode.position, radius: 0.001, color: UIColor.white)
+    }
     
     init(positionStart: SCNVector3, positionEnd: SCNVector3, radius: CGFloat, color: UIColor){
         super.init()
-        
+        setupGeometry(positionStart: positionStart, positionEnd: positionEnd, radius: radius, color: color)
+    }
+    
+    func setupGeometry(positionStart: SCNVector3, positionEnd: SCNVector3, radius: CGFloat, color: UIColor) {
         let height = CGFloat(GLKVector3Distance(SCNVector3ToGLKVector3(positionStart), SCNVector3ToGLKVector3(positionEnd)))
         self.radius = radius
         
@@ -41,28 +56,28 @@ class Connector: SCNNode {
             endNode.addChildNode(zAxisNode)
             endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
             self.addChildNode(endNode)
-
+            
         }
         else if (positionStart.x < 0.0 && positionStart.y < 0.0 && positionStart.z < 0.0 && positionEnd.x < 0.0 && positionEnd.y < 0.0 && positionEnd.z > 0.0)
         {
             endNode.addChildNode(zAxisNode)
             endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
             self.addChildNode(endNode)
-
+            
         }
         else if (positionStart.x < 0.0 && positionStart.y > 0.0 && positionStart.z < 0.0 && positionEnd.x < 0.0 && positionEnd.y > 0.0 && positionEnd.z > 0.0)
         {
             endNode.addChildNode(zAxisNode)
             endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
             self.addChildNode(endNode)
-
+            
         }
         else if (positionStart.x > 0.0 && positionStart.y > 0.0 && positionStart.z < 0.0 && positionEnd.x > 0.0 && positionEnd.y > 0.0 && positionEnd.z > 0.0)
         {
             endNode.addChildNode(zAxisNode)
             endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
             self.addChildNode(endNode)
-
+            
         }
         else
         {
