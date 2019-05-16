@@ -86,35 +86,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         let currentRotation = CGFloat(recurseBlock.eulerAngles.z - Float(rotationOffset))
         currentDepth = -(Int(currentRotation / threshold) - 1)
         
-//        print(recurseBlock.node.convertVector(recurseBlock.node.eulerAngles, to: sceneView.scene.rootNode))
-//        print(recurseBlock.node.worldFront)
-//        print(recurseBlock.node.convertTransform(recurseBlock.node.worldTransform, to: recurseBlock.node).)
-//        let dummy
-//        let orientation = recurseBlock.node.orientation
-//        var glQuaternion = GLKQuaternionMake(orientation.x, orientation.y, orientation.z, orientation.w)
-//
-        // Rotate around Z axis
-//        let multiplier = GLKQuaternionMakeWithAngleAndAxis(0.5, 0, 0, 1)
-//        glQuaternion = GLKQuaternionMultiply(glQuaternion, multiplier)
-        
-//        print(recurseBlock.node.orientation)
-//        print(recurseBlock.node.pivot)
-
-        
-//        print(recurseBlock.eulerAngles.z)
-//        print(recurseBlock.node.orientation)
-        
-//        guard let recurseWolrdNode =  sceneView.node(for: recurseBlock.anchor) else { return }
-//
-//        let convertedTransform = recurseBlock.node.convertVector(recurseBlock.eulerAngles, to: sceneView)
-        
-//        let anchorNodeOrientation = recurseWolrdNode.worldOrientation
-
-//        print(currentRecurseRotation)
-    
-        
         // Don't continue until you have the grow to reference
-        guard let growBlock = physicalBlocks["GROW"] else { return }
+        // guard let _ = physicalBlocks["GROW"] else { return }
         
         // Make it general so that it looks for ANY leaf
         // And if it does, to look for the other one
@@ -145,11 +118,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             if block.depth <= currentDepth {
                 
                 block.node.opacity = 1
-//                if block.depth == currentDepth {
-//                    block.node.geometry?.firstMaterial?.diffuse.contents = UIColor.green
-//                } else {
-//                    block.node.geometry?.firstMaterial?.diffuse.contents = UIColor.white
-//                }
                 
                 if block.childBlocks.count > 1 {
                     let child1 = block.childBlocks[0].node!
@@ -157,14 +125,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                     
                     let from1Trans: SCNVector3! = child1.convertVector(offset1, from: child1.parent!)
                     let from2Trans: SCNVector3! = child2.convertVector(offset2, from: child2.parent!)
-                        
-//                    if depth == 2 {
-//                        from1Trans = child1.convertVector(offset1, from: child1.parent!.parent!)
-//                        from2Trans = child2.convertVector(offset2, from: child2.parent!.parent!)
-//                    } else {
-//                        from1Trans = child1.convertVector(offset1, from: child1.parent!)
-//                        from2Trans = child2.convertVector(offset2, from: child2.parent!)
-//                    }
                     
                     // Adjust the scale out on every level
                     let scaleFactor = powf(0.75, Float(depth))
@@ -177,14 +137,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                     
                     block.connectors[0].update(startPos: SCNVector3Zero, endPos: child1.position)
                     block.connectors[1].update(startPos: SCNVector3Zero, endPos: child2.position)
-//
-//                    if block.depth == currentDepth {
-//                        block.connectors[0].opacity = 0
-//                        block.connectors[1].opacity = 0
-//                    } else {
-//                        block.connectors[0].opacity = 1
-//                        block.connectors[1].opacity = 1
-//                    }
                 }
             } else {
                 block.node.opacity = 0
@@ -328,8 +280,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 self.recursivelyPopulate(from: leaf1, depth: self.maxDepth)
                 self.recursivelyPopulate(from: leaf2, depth: self.maxDepth)
                 print(self.virtualConnectors.count)
-                
-
             }
         }
     }
@@ -338,7 +288,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         if depth == 1 {
             return
         } else {
-            
             // Add two child nodes to each child
             let child1Node = SCNNode(geometry: SCNSphere(radius: 0.007))
             child1Node.geometry?.firstMaterial?.diffuse.contents = UIColor.white
