@@ -13,6 +13,7 @@ protocol Block: class {
     var type: BlockType! { get set }
     var depth: Int! { get set }
     var childBlocks: [VirtualBlock]! { get set }
+    var connectors: [Connector]! { get set }
     var node: SCNNode!  { get set }
     var id: String! { get }
     var position: SCNVector3! { get }

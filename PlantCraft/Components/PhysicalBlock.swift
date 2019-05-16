@@ -14,8 +14,7 @@ class PhysicalBlock: Block, Detectable {
     var node: SCNNode!
     var depth: Int!
     var childBlocks: [VirtualBlock]!
-    var connector1: Connector!
-    var connector2: Connector!
+    var connectors: [Connector]!
     var anchor: ARImageAnchor!
     var position: SCNVector3! {
         return self.node.position
@@ -38,6 +37,8 @@ class PhysicalBlock: Block, Detectable {
         self.anchor = anchor
         self.node = node
         self.childBlocks = [VirtualBlock]()
+        self.connectors = [Connector]()
+
     }
     
     func update(node: SCNNode, anchor: ARImageAnchor) {

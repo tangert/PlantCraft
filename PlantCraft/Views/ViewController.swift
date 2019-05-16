@@ -86,6 +86,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         let currentRotation = CGFloat(recurseBlock.eulerAngles.z - Float(rotationOffset))
         currentDepth = -(Int(currentRotation / threshold) - 1)
         
+//        print(recurseBlock.node.convertVector(recurseBlock.node.eulerAngles, to: sceneView.scene.rootNode))
+//        print(recurseBlock.node.worldFront)
+//        print(recurseBlock.node.convertTransform(recurseBlock.node.worldTransform, to: recurseBlock.node).)
 //        let dummy
 //        let orientation = recurseBlock.node.orientation
 //        var glQuaternion = GLKQuaternionMake(orientation.x, orientation.y, orientation.z, orientation.w)
@@ -108,12 +111,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 //        let anchorNodeOrientation = recurseWolrdNode.worldOrientation
 
 //        print(currentRecurseRotation)
-        
-
-        // Update the positions of the connectors
-        for (id, conn) in physicalConnectors {
-            conn.update(startPos: physicalBlocks[id]!.position, endPos: recurseBlock.position)
-        }
+    
         
         // Don't continue until you have the grow to reference
         guard let growBlock = physicalBlocks["GROW"] else { return }
@@ -130,127 +128,71 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             // Update the recurse block's text
             let text = recurseBlock.node.childNode(withName: "DEPTH_LABEL", recursively: false)?.geometry as! SCNText
             text.string = "\(self.currentDepth)"
+
+            // Update the positions of the connectors
+            for (id, conn) in self.physicalConnectors {
+                conn.update(startPos: self.physicalBlocks[id]!.position, endPos: recurseBlock.position)
+            }
             
             // Iterative updates
             self.updateVirtualBlocks(depth: self.currentDepth, offset1: leaf1Offset, offset2: leaf2Offset)
-            
-            // Recursive updates
-            //self.recursivelyUpdate(from: leaf1, depth: self.currentDepth, offset1: leaf1Offset, offset2: leaf2Offset)
-            //self.recursivelyUpdate(from: leaf2, depth: self.currentDepth, offset1: leaf1Offset, offset2: leaf2Offset)
-
         }
     }
     
     func updateVirtualBlocks(depth: Int, offset1: SCNVector3, offset2: SCNVector3) {
-//        for(_, conn) in virtualConnectors {
-//            if conn.depth <= currentDepth {
-//                conn.opacity = 1
-//            } else {
-//                conn.opacity = 0
-//            }
-//
-//            let block = conn.startBlock!
-//
-//            if block.childBlocks.count > 0 {
-//                let child1 = block.childBlocks[0].node!
-//                let child2 = block.childBlocks[1].node!
-//
-//                let from1Trans = child1.convertVector(offset1, from: child1.parent!.parent)
-//                let from2Trans = child2.convertVector(offset2, from: child2.parent!.parent)
-//
-//                // Adjust the scale out on every level
-//                let scaleFactor = powf(0.8, Float(depth))
-//
-//                child1.position = from1Trans * scaleFactor
-//                child1.rotation = child1.parent!.rotation
-//
-//                child2.position = from2Trans * scaleFactor
-//                child2.rotation = child2.parent!.rotation
-//
-//                conn.update(startPos: block.position, endPos: <#T##SCNVector3#>)
-//                block.connector1.update(startPos: block.position, endPos: child1.position)
-//                block.connector2.update(startPos: block.position, endPos: child2.position)
-//            }
-//        }
-//
         for (_, block) in virtualBlocks {
             
             if block.depth <= currentDepth {
+                
                 block.node.opacity = 1
+//                if block.depth == currentDepth {
+//                    block.node.geometry?.firstMaterial?.diffuse.contents = UIColor.green
+//                } else {
+//                    block.node.geometry?.firstMaterial?.diffuse.contents = UIColor.white
+//                }
+                
+                if block.childBlocks.count > 1 {
+                    let child1 = block.childBlocks[0].node!
+                    let child2 = block.childBlocks[1].node!
+                    
+                    let from1Trans: SCNVector3! = child1.convertVector(offset1, from: child1.parent!)
+                    let from2Trans: SCNVector3! = child2.convertVector(offset2, from: child2.parent!)
+                        
+//                    if depth == 2 {
+//                        from1Trans = child1.convertVector(offset1, from: child1.parent!.parent!)
+//                        from2Trans = child2.convertVector(offset2, from: child2.parent!.parent!)
+//                    } else {
+//                        from1Trans = child1.convertVector(offset1, from: child1.parent!)
+//                        from2Trans = child2.convertVector(offset2, from: child2.parent!)
+//                    }
+                    
+                    // Adjust the scale out on every level
+                    let scaleFactor = powf(0.75, Float(depth))
+                    
+                    child1.position = from1Trans * scaleFactor
+                    child1.rotation = child1.parent!.rotation
+                    
+                    child2.position = from2Trans * scaleFactor
+                    child2.rotation = child2.parent!.rotation
+                    
+                    block.connectors[0].update(startPos: SCNVector3Zero, endPos: child1.position)
+                    block.connectors[1].update(startPos: SCNVector3Zero, endPos: child2.position)
+//
+//                    if block.depth == currentDepth {
+//                        block.connectors[0].opacity = 0
+//                        block.connectors[1].opacity = 0
+//                    } else {
+//                        block.connectors[0].opacity = 1
+//                        block.connectors[1].opacity = 1
+//                    }
+                }
             } else {
                 block.node.opacity = 0
             }
-            
-            if block.childBlocks.count > 0 {
-                let child1 = block.childBlocks[0].node!
-                let child2 = block.childBlocks[1].node!
-                
-                let from1Trans = child1.convertVector(offset1, from: child1.parent!.parent)
-                let from2Trans = child2.convertVector(offset2, from: child2.parent!.parent)
-                
-                // Adjust the scale out on every level
-                let scaleFactor = powf(0.8, Float(depth))
-                
-                child1.position = from1Trans * scaleFactor
-                child1.rotation = child1.parent!.rotation
-                
-                child2.position = from2Trans * scaleFactor
-                child2.rotation = child2.parent!.rotation
-                
-                let connector1Id = "\(String(describing: block.id!))-\(String(describing: block.childBlocks[0].id))"
-                let connector2Id = "\(String(describing: block.id!))-\(String(describing: block.childBlocks[1].id))"
-                
-                virtualConnectors[connector1Id]?.update(startPos: block.position, endPos: child1.position)
-                virtualConnectors[connector2Id]?.update(startPos: block.position, endPos: child1.position)
-
-//                block.connector1.update(startPos: block.position, endPos: child1.position)
-//                block.connector2.update(startPos: block.position, endPos: child2.position)
-//                virtualConnectors[children[0].name!]!.update(startPos: block.position, endPos: children[0].position)
-//                virtualConnectors[children[1].name!]!.update(startPos: block.position, endPos: children[1].position)
-            }
         }
     }
-//
-//    func recursivelyUpdate(from: Block, depth: Int, offset1: SCNVector3, offset2: SCNVector3) {
-//        if depth == 1 {
-//            // BASIC: Adjust opacity
-//            // TODO: Scale/grow
-//            if from.depth <= currentDepth {
-//                from.node.opacity = 1
-//            } else {
-//                from.node.opacity = 0
-//            }
-//            return
-//        } else {
-//            // Convert two parent's up: the last reference
-//            guard let children = from.childBlocks else { return }
-//            let child1Node = children[0].node!
-//            let child2Node = children[1].node!
-//
-//            let from1Trans = child1Node.convertVector(offset1, from: child1Node.parent!.parent)
-//            let from2Trans = child2Node.convertVector(offset2, from: child2Node.parent!.parent)
-//
-//            // Adjust by parameter
-//            let translationScale: SCNFloat = 0.67 * Float(from.depth)
-//
-//            // implement rotation scale
-//            let rotationScale: SCNFloat = 1
-//
-//            child1Node.position = from1Trans * translationScale
-//            child1Node.rotation = child1Node.parent!.rotation
-//            child1Node.rotation.y *= -1
-//
-//            child2Node.position = from2Trans
-//            child2Node.rotation = child2Node.parent!.rotation
-//            child2Node.rotation.y *= -1
-//
-//            recursivelyUpdate(from: children[0], depth: depth-1, offset1: from1Trans, offset2: from2Trans)
-//            recursivelyUpdate(from: children[1], depth: depth-1, offset1: from1Trans, offset2: from2Trans)
-//        }
-//    }
-//
-    // MARK: - ARSCNViewDelegate
     
+    // MARK: - ARSCNViewDelegate
     // Updates the nodes
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
         updateView()
@@ -317,7 +259,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 repeatUI.eulerAngles.x = -.pi/2
                 repeatUI.geometry?.firstMaterial?.isDoubleSided = true
                 repeatUI.renderingOrder = -2
-                repeatUI.opacity = 1.0
+                repeatUI.opacity = 0.5
                 
                 // Holds the current depth level
                 let textGeometry = SCNText(string: "\(self.currentDepth)", extrusionDepth: 0.1)
@@ -343,6 +285,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 
             } else {
                 
+                mainPlane.cornerRadius = 20
+                
                 // Create a SceneKit root node with the plane geometry to attach to the scene graph
                 // This node will hold the virtual UI in place
                 let xReferenceNode = SCNNode(geometry: mainPlane)
@@ -357,6 +301,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 markerNode.opacity = 0.25
                 
                 let sphereNode = SCNNode(geometry: SCNSphere(radius: 0.010))
+                if type == .leaf {
+                    sphereNode.geometry?.firstMaterial?.diffuse.contents = UIColor.green
+                } else if type == .grow {
+                    sphereNode.geometry?.firstMaterial?.diffuse.contents = UIColor.brown
+                }
+                
                 sphereNode.opacity = 0.25
                 sphereNode.renderingOrder = 1
                 
@@ -377,6 +327,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                 
                 self.recursivelyPopulate(from: leaf1, depth: self.maxDepth)
                 self.recursivelyPopulate(from: leaf2, depth: self.maxDepth)
+                print(self.virtualConnectors.count)
+                
 
             }
         }
@@ -388,14 +340,18 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         } else {
             
             // Add two child nodes to each child
-            let child1Node = SCNNode(geometry: SCNSphere(radius: 0.01))
+            let child1Node = SCNNode(geometry: SCNSphere(radius: 0.007))
+            child1Node.geometry?.firstMaterial?.diffuse.contents = UIColor.white
+            child1Node.opacity = 0.75
             let child1 = VirtualBlock(type: .leaf, node: child1Node, parent: from)
             let child1ID = UUID().uuidString
             child1.id = child1ID
             child1.node.name = child1ID
             child1.depth = from.depth + 1
         
-            let child2Node = SCNNode(geometry: SCNSphere(radius: 0.01))
+            let child2Node = SCNNode(geometry: SCNSphere(radius: 0.007))
+            child2Node.geometry?.firstMaterial?.diffuse.contents = UIColor.white
+            child2Node.opacity = 0.75
             let child2 = VirtualBlock(type: .leaf, node: child2Node, parent: from)
             let child2ID = UUID().uuidString
             child2.id = child2ID
@@ -407,36 +363,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
             
             // Add the children to the current node
             // Simply add the connector as a child...
-            let connection1 = Connector(start: from, end: child1, depth: from.depth+1)
-            connection1.id = "\(String(describing: from.id))-\(String(describing: child1.id))"
-            let connection2 = Connector(start: from, end: child2, depth: from.depth+1)
-            connection2.id = "\(String(describing: from.id))-\(String(describing: child2.id))"
-
-            from.node.addChildNode(connection1)
-            from.node.addChildNode(connection2)
-            virtualConnectors[connection1.id] = connection1
-            virtualConnectors[connection2.id] = connection2
+            let connector1 = Connector(start: from, end: child1, depth: from.depth+1, color: UIColor.brown)
+            connector1.id = "\(String(describing: from.id))-\(String(describing: child1.id))"
+            let connector2 = Connector(start: from, end: child2, depth: from.depth+1, color: UIColor.brown)
+            connector2.id = "\(String(describing: from.id))-\(String(describing: child2.id))"
+            
+            virtualConnectors[connector1.id] = connector1
+            virtualConnectors[connector2.id] = connector2
             from.childBlocks = [child1,child2]
-
+            from.connectors = [connector1, connector2]
+            
+            from.node.addChildNode(connector1)
+            from.node.addChildNode(connector2)
             from.node.addChildNode(child1.node)
             from.node.addChildNode(child2.node)
-            
-            // relative??
-//            let child1Connection = Connector(positionStart: SCNVector3Zero, positionEnd: child1.position, radius: 0.005, color: UIColor.white)
-//            let child2Connection = Connector(positionStart: SCNVector3Zero, positionEnd: child2.position, radius: 0.005, color: UIColor.white)
-//            child1Connection.name = "\(String.init(describing: child1.id))-C"
-//            child2Connection.name = "\(String.init(describing: child2.id))-C"
-//
-//            virtualConnectors[child1.id] = child1Connection
-//            virtualConnectors[child2.id] = child2Connection
-//            from.connector1 = child1Connection
-//            from.connector2 = child2Connection
-//            from.node.addChildNode(child1Connection)
-//            from.node.addChildNode(child2Connection)
-//
-//            self.sceneView.scene.rootNode.addChildNode(child1Connection)
-//            self.sceneView.scene.rootNode.addChildNode(child2Connection)
-//
+        
             // Populate one more level
             recursivelyPopulate(from: child1, depth: depth-1)
             recursivelyPopulate(from: child2, depth: depth-1)

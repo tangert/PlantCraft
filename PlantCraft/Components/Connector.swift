@@ -18,18 +18,18 @@ class Connector: SCNNode {
     var radius: CGFloat!
     var startBlock: Block!
     var endBlock: Block!
+    var color: UIColor!
     var children = [Connector]()
     var depth: Int!
     var id: String!
     
-    init(start: Block, end: Block, depth: Int) {
+    init(start: Block, end: Block, depth: Int, color: UIColor) {
         super.init()
         startBlock = start
         endBlock = end
         self.depth = depth
-        startNode = startBlock.node!
-        endNode = endBlock.node!
-        setupGeometry(positionStart: startNode.position, positionEnd: endNode.position, radius: 0.001, color: UIColor.white)
+        self.color = color
+        setupGeometry(positionStart: startBlock.node!.position, positionEnd: startBlock.node!.position, radius: 0.002, color: color)
     }
     
     init(positionStart: SCNVector3, positionEnd: SCNVector3, radius: CGFloat, color: UIColor){
@@ -46,7 +46,7 @@ class Connector: SCNNode {
         zAxisNode.eulerAngles.x = .pi/2
         
         cylinderNode.geometry?.firstMaterial?.diffuse.contents = color
-        updateCylinder(startPos: positionStart, endPos: positionEnd)
+        updateCylinder(positionStart: positionStart, positionEnd: positionEnd)
         zAxisNode.addChildNode(cylinderNode)
         self.addChildNode(endNode)
         self.addChildNode(startNode)
@@ -90,14 +90,43 @@ class Connector: SCNNode {
     func update(startPos: SCNVector3, endPos: SCNVector3) {
         startNode.position = startPos
         endNode.position = endPos
-        endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
-        startNode.constraints = [ SCNLookAtConstraint(target: endNode) ]
-        updateCylinder(startPos: startPos, endPos: endPos)
+        updateCylinder(positionStart: startPos, positionEnd: endPos)
     }
     
-    func updateCylinder(startPos: SCNVector3, endPos: SCNVector3) {
-        let height = CGFloat(GLKVector3Distance(SCNVector3ToGLKVector3(startPos), SCNVector3ToGLKVector3(endPos)))
+    func updateCylinder(positionStart: SCNVector3, positionEnd: SCNVector3) {
+        
+        if (positionStart.x > 0.0 && positionStart.y < 0.0 && positionStart.z < 0.0 && positionEnd.x > 0.0 && positionEnd.y < 0.0 && positionEnd.z > 0.0)
+        {
+            endNode.addChildNode(zAxisNode)
+            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
+            
+        }
+        else if (positionStart.x < 0.0 && positionStart.y < 0.0 && positionStart.z < 0.0 && positionEnd.x < 0.0 && positionEnd.y < 0.0 && positionEnd.z > 0.0)
+        {
+            endNode.addChildNode(zAxisNode)
+            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
+            
+        }
+        else if (positionStart.x < 0.0 && positionStart.y > 0.0 && positionStart.z < 0.0 && positionEnd.x < 0.0 && positionEnd.y > 0.0 && positionEnd.z > 0.0)
+        {
+            endNode.addChildNode(zAxisNode)
+            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
+            
+        }
+        else if (positionStart.x > 0.0 && positionStart.y > 0.0 && positionStart.z < 0.0 && positionEnd.x > 0.0 && positionEnd.y > 0.0 && positionEnd.z > 0.0)
+        {
+            endNode.addChildNode(zAxisNode)
+            endNode.constraints = [ SCNLookAtConstraint(target: startNode) ]
+        }
+        else
+        {
+            startNode.addChildNode(zAxisNode)
+            startNode.constraints = [ SCNLookAtConstraint(target: endNode) ]
+        }
+        
+        let height = CGFloat(GLKVector3Distance(SCNVector3ToGLKVector3(positionStart), SCNVector3ToGLKVector3(positionEnd)))
         let cylinderGeometry = SCNCylinder(radius: self.radius, height: height)
+        cylinderGeometry.firstMaterial?.diffuse.contents = self.color
         cylinderNode.geometry = cylinderGeometry
         cylinderNode.position.y = Float(-height/2)
     }

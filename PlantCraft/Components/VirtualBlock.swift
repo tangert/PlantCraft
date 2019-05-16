@@ -15,8 +15,7 @@ class VirtualBlock: Block, Recursable {
     var depth: Int!
     var id: String!
     var type: BlockType!
-    var connector1: Connector!
-    var connector2: Connector!
+    var connectors: [Connector]!
     var node: SCNNode!
     var position: SCNVector3! {
         return self.node.position
@@ -35,6 +34,7 @@ class VirtualBlock: Block, Recursable {
         self.type = type
         self.parent = parent
         self.childBlocks = [VirtualBlock]()
+        self.connectors = [Connector]()
     }
     
     init(type: BlockType, node: SCNNode, parent: Block) {
